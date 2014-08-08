@@ -12,7 +12,7 @@ public class Terrain : MonoBehaviour {
 	private Mesh mesh;
 	public int[] triangles;
 	public Vector3[] vertices;
-	private Transform cam;
+	private Transform cam, cursor;
 	
 	void Start () {
 		roughness = 1;
@@ -32,7 +32,72 @@ public class Terrain : MonoBehaviour {
 		cam = transform.GetChild(0);
 		cam.position = new Vector3(80, 128, -80);
 		cam.Rotate(Vector3.left, -20);
+
+		cursor = transform.GetChild(1);
+		cursor.localScale = new Vector3(3, 30, 3);
+		cursor.position = new Vector3(64, heightMap[64, 64], 64);
+		Debug.Log(heightMap[64,64]);
 	}
+
+	void Update () {
+		CameraMovement ();
+		CursorMovement ();
+	}
+
+	// ------------------------------------
+	// Movement
+	// ------------------------------------
+	
+	void CursorMovement ()
+	{
+		int old_x, old_z, new_x, new_z;
+		old_x = (int)cursor.position.x;
+		old_z = (int)cursor.position.z;
+		new_x = old_x;
+		new_z = old_z;
+		if (Input.GetKey (KeyCode.W)) {
+			if (old_z + 1 < lastElement) {
+				new_z = old_z + 1;
+			} else {
+				new_z = lastElement;
+			}
+		}
+		if (Input.GetKey (KeyCode.A)) {
+			if (old_x - 1 > 0) {
+				new_x = old_x - 1;
+			} else {
+				new_x = 0;
+			}
+		}
+		if (Input.GetKey (KeyCode.S)) {
+			if (old_z - 1 > 0) {
+				new_z = old_z - 1;
+			} else {
+				new_z = 0;
+			}
+		}
+		if (Input.GetKey (KeyCode.D)) {
+			if (old_x + 1 < lastElement) {
+				new_x = old_x + 1;
+			} else {
+				new_x = lastElement;
+			}
+
+		}
+		cursor.position = new Vector3 (new_x, heightMap [new_x, new_z] + cursor.localScale.y / 2, new_z);
+	}
+
+	void CameraMovement ()
+	{
+		if (Input.GetKey (KeyCode.LeftArrow))
+			cam.RotateAround (new Vector3 (64, 0, 64), Vector3.up, 50 * Time.deltaTime);
+		if (Input.GetKey (KeyCode.RightArrow))
+			cam.RotateAround (new Vector3 (64, 0, 64), Vector3.up, -50 * Time.deltaTime);
+	}
+
+	// ------------------------------------
+	// Generate terrain
+	// ------------------------------------
 
 	void generatePoints(int current_size) {
 		int x, y, half = current_size / 2;
@@ -61,6 +126,7 @@ public class Terrain : MonoBehaviour {
 			           heightMap[x + size, y - size], 
 			           heightMap[x + size, y + size]) + rand;
 	}
+
 	float Diamond(int x, int y, int size, float rand)
 	{
 		int left, right, top, bottom;
@@ -90,23 +156,11 @@ public class Terrain : MonoBehaviour {
 		p4 = heightMap[left, y] + rand;
 		return Average (p1, p2, p3, p4);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		if(Input.GetKey(KeyCode.LeftArrow))
-			cam.RotateAround(new Vector3(64, 0, 64), Vector3.up, 50 * Time.deltaTime);
-		if(Input.GetKey(KeyCode.RightArrow))
-			cam.RotateAround(new Vector3(64, 0, 64), Vector3.up, -50 * Time.deltaTime);
-
-		
-	}
 
 	float Average(float p1, float p2, float p3, float p4)
 	{
 		return (p1 + p2 + p3 + p4) / 4;
 	}
-
-
 
 	// ------------------------------------
 	// Rendering the terrain
