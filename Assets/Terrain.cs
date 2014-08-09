@@ -40,7 +40,15 @@ public class Terrain : MonoBehaviour {
 		cursor.position = new Vector3(64, heightMap[64, 64], 64);
 	}
 
+	void Restart() {
+		generatePoints(lastElement);
+		cam.position = new Vector3(80, 128, -80);
+		cursor.position = new Vector3(64, heightMap[64, 64], 64);
+	}
+
 	void Update () {
+
+
 		CameraMovement ();
 		CursorMovement ();
 
@@ -52,6 +60,9 @@ public class Terrain : MonoBehaviour {
 		}
 
 		RenderMesh ();
+
+		if (Input.GetKeyDown(KeyCode.R))
+			Restart();
 	}
 
 	// ------------------------------------
