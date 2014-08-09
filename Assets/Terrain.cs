@@ -13,9 +13,11 @@ public class Terrain : MonoBehaviour {
 	public int[] triangles;
 	public Vector3[] vertices;
 	private Transform cam, cursor;
+	public int alterTerrainSize;
 	
 	void Start () {
-		roughness = 0.9f;
+		alterTerrainSize = 6;
+		roughness = 0.6f;
 		random_limit = 1f;
 		size = 7;
 		arrayDimension = (int)Mathf.Pow(2, size) + 1;
@@ -36,28 +38,55 @@ public class Terrain : MonoBehaviour {
 		cursor = transform.GetChild(1);
 		cursor.localScale = new Vector3(3, 30, 3);
 		cursor.position = new Vector3(64, heightMap[64, 64], 64);
-		Debug.Log(heightMap[64,64]);
 	}
 
 	void Update () {
 		CameraMovement ();
 		CursorMovement ();
 
-		float height = heightMap[(int)cursor.position.x, (int)cursor.position.z];
-		if (Input.GetKey(KeyCode.UpArrow)) {
-			height += 1;
+		if (Input.GetKeyDown(KeyCode.UpArrow)) {
+			MakeMountains((int)cursor.position.x, (int)cursor.position.z);
 		}
-		if (Input.GetKey(KeyCode.DownArrow)) {
-			height -= 1;
+		if (Input.GetKeyDown(KeyCode.DownArrow)) {
+			MakeValleys((int)cursor.position.x, (int)cursor.position.z);
 		}
-		heightMap[(int)cursor.position.x, (int)cursor.position.z] = height;
-		// iterate over a square, start at current position - some value in x and z position
-		// find algorithm to make the value vary sinusoidally from -1 to 1 
-		// as the value is farther or closer to current positoin
 
 		RenderMesh ();
 	}
 
+	// ------------------------------------
+	// Terrain Alteration
+	// ------------------------------------
+	
+	void MakeMountains(int x, int z) {
+		for(int i = 0; i <= 2 * alterTerrainSize; i++) {
+			for(int j = 0; j <= 2 * alterTerrainSize; j++) {
+				float h = heightMap[x - alterTerrainSize + i, z - alterTerrainSize + j];
+				h += (FindValue(i) + FindValue(j)) / 2;
+				heightMap [x - alterTerrainSize + i, z - alterTerrainSize + j] = h;
+			}
+		}
+	}
+
+	void MakeValleys(int x, int z) {
+		for(int i = 0; i <= 2 * alterTerrainSize; i++) {
+			for(int j = 0; j <= 2 * alterTerrainSize; j++) {
+				float h = heightMap[x - alterTerrainSize + i, z - alterTerrainSize + j];
+				h -= (FindValue(i) + FindValue(j)) / 2;
+				heightMap [x - alterTerrainSize + i, z - alterTerrainSize + j] = h;
+			}
+		}
+	}
+
+	int FindValue(int i) {
+		if (i <= alterTerrainSize) {
+			return i;
+		} else {
+			return alterTerrainSize - (i - alterTerrainSize);
+		}
+	}
+	
+	
 	// ------------------------------------
 	// Movement
 	// ------------------------------------
@@ -110,7 +139,7 @@ public class Terrain : MonoBehaviour {
 	}
 
 	// ------------------------------------
-	// Generate terrain
+	// Terrain Generation
 	// ------------------------------------
 
 	void generatePoints(int current_size) {
@@ -177,12 +206,11 @@ public class Terrain : MonoBehaviour {
 	}
 
 	// ------------------------------------
-	// Rendering the terrain
+	// Rendering
 	// ------------------------------------
 
 	void RenderMesh ()
 	{
-		// Rendering
 		mesh = new Mesh ();
 		GetComponent<MeshFilter> ().mesh = mesh;
 		vertices = GetVertices (heightMap);
