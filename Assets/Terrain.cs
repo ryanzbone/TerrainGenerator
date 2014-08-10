@@ -17,7 +17,7 @@ public class Terrain : MonoBehaviour {
 	
 	void Start () {
 		alterTerrainSize = 6;
-		roughness = 0.6f;
+		roughness = 0.9f;
 		random_limit = 1f;
 		size = 7;
 		arrayDimension = (int)Mathf.Pow(2, size) + 1;
@@ -222,6 +222,7 @@ public class Terrain : MonoBehaviour {
 
 	void RenderMesh ()
 	{
+		Destroy(mesh);
 		mesh = new Mesh ();
 		GetComponent<MeshFilter> ().mesh = mesh;
 		vertices = GetVertices (heightMap);
