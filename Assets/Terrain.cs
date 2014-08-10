@@ -30,7 +30,7 @@ public class Terrain : MonoBehaviour {
 		heightMap[lastElement, lastElement] = 0;
 
 		generatePoints(lastElement);
-		RenderMesh ();
+		InitializeMesh ();
 		cam = transform.GetChild(0);
 		cam.position = new Vector3(80, 128, -80);
 		cam.Rotate(Vector3.left, -20);
@@ -47,8 +47,6 @@ public class Terrain : MonoBehaviour {
 	}
 
 	void Update () {
-
-
 		CameraMovement ();
 		CursorMovement ();
 
@@ -59,7 +57,7 @@ public class Terrain : MonoBehaviour {
 			MakeValleys((int)cursor.position.x, (int)cursor.position.z);
 		}
 
-		RenderMesh ();
+		UpdateMesh ();
 
 		if (Input.GetKeyDown(KeyCode.R))
 			Restart();
@@ -220,9 +218,12 @@ public class Terrain : MonoBehaviour {
 	// Rendering
 	// ------------------------------------
 
-	void RenderMesh ()
+	void UpdateMesh(){
+		mesh.vertices = GetVertices(heightMap);
+	}
+
+	void InitializeMesh ()
 	{
-		Destroy(mesh);
 		mesh = new Mesh ();
 		GetComponent<MeshFilter> ().mesh = mesh;
 		vertices = GetVertices (heightMap);
