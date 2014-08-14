@@ -7,4 +7,4 @@
 - Regenerate Terrain: R
 
 ###Basic Functionality
-![terrain](http://i.imgur.com/ME1HkKY.gif)
+![terrain](http://i.imgur.com/vZ3ZfnD.gif)
