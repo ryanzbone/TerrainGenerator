@@ -43,6 +43,8 @@ public class Terrain : MonoBehaviour {
 	void Restart() {
 		generatePoints(lastElement);
 		cam.position = new Vector3(80, 128, -80);
+		cam.rotation = Quaternion.identity;
+		cam.Rotate(Vector3.left, -20);
 		cursor.position = new Vector3(64, heightMap[64, 64], 64);
 	}
 
